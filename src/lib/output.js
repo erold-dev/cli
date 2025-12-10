@@ -43,19 +43,28 @@ export const icons = {
 // ============================================
 
 export const statusColors = {
-  // Task statuses
+  // Task statuses (supports both hyphen and underscore formats)
+  backlog: chalk.hex('#94a3b8'),      // slate
+  analysis: chalk.magenta,             // purple
   todo: chalk.gray,
+  'in-progress': chalk.blue,
   in_progress: chalk.blue,
-  in_review: chalk.yellow,
+  'in-review': chalk.hex('#6366f1'),   // indigo
+  in_review: chalk.hex('#6366f1'),
+  bug: chalk.hex('#f97316'),           // orange
   blocked: chalk.red,
   done: chalk.green,
 
   // Project statuses
   planning: chalk.gray,
   active: chalk.blue,
+  inProgress: chalk.blue,
+  'in-progress': chalk.blue,
   on_hold: chalk.yellow,
+  onHold: chalk.yellow,
   completed: chalk.green,
   cancelled: chalk.red,
+  archived: chalk.gray,
 
   // Priority
   low: chalk.gray,

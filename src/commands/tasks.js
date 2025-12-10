@@ -22,7 +22,7 @@ export function registerTaskCommands(program) {
     .alias('ls')
     .description('List tasks')
     .option('-p, --project <id>', 'Filter by project')
-    .option('-s, --status <status>', 'Filter by status (todo, in_progress, in_review, blocked, done)')
+    .option('-s, --status <status>', 'Filter by status (backlog, analysis, todo, in-progress, in-review, bug, blocked, done)')
     .option('-a, --assignee <email>', 'Filter by assignee')
     .option('--priority <priority>', 'Filter by priority (low, medium, high, urgent, critical)')
     .option('-m, --mine', 'Show only my tasks')
