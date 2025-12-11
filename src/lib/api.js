@@ -256,6 +256,21 @@ export const knowledge = {
   search: (query) => get(`${getTenantPath()}/knowledge`, { search: query }),
 };
 
+// --- Vault (Project Secrets) ---
+export const vault = {
+  list: (projectId) => get(`${getTenantPath()}/projects/${projectId}/vault`),
+  get: (projectId, entryId) => get(`${getTenantPath()}/projects/${projectId}/vault/${entryId}`),
+  create: (projectId, data) => post(`${getTenantPath()}/projects/${projectId}/vault`, data),
+  update: (projectId, entryId, data) => patch(`${getTenantPath()}/projects/${projectId}/vault/${entryId}`, data),
+  delete: (projectId, entryId) => del(`${getTenantPath()}/projects/${projectId}/vault/${entryId}`),
+};
+
+// --- Tech Info (Project Tech Stack) ---
+export const techInfo = {
+  get: (projectId) => get(`${getTenantPath()}/projects/${projectId}/tech-info`),
+  update: (projectId, data) => patch(`${getTenantPath()}/projects/${projectId}/tech-info`, data),
+};
+
 // --- Context ---
 export const context = {
   get: () => get(`${getTenantPath()}/context`),
@@ -308,6 +323,8 @@ export default {
   tasks,
   projects,
   knowledge,
+  vault,
+  techInfo,
   context,
   members,
   invites,

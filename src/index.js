@@ -14,6 +14,8 @@ import { registerAuthCommands } from './commands/auth.js';
 import { registerTaskCommands } from './commands/tasks.js';
 import { registerProjectCommands } from './commands/projects.js';
 import { registerKnowledgeCommands } from './commands/knowledge.js';
+import { registerVaultCommands } from './commands/vault.js';
+import { registerTechInfoCommands } from './commands/tech-info.js';
 import { registerContextCommands } from './commands/context.js';
 import { registerConfigCommands } from './commands/config.js';
 import { registerGitCommands } from './commands/git.js';
@@ -49,6 +51,8 @@ function createProgram() {
   registerTaskCommands(program);
   registerProjectCommands(program);
   registerKnowledgeCommands(program);
+  registerVaultCommands(program);
+  registerTechInfoCommands(program);
   registerContextCommands(program);
   registerGitCommands(program);
   registerShortcutCommands(program);

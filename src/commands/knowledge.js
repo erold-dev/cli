@@ -34,6 +34,8 @@ export function registerKnowledgeCommands(program) {
     .alias('ls')
     .description('List knowledge entries')
     .option('-c, --category <category>', `Filter by category (${CATEGORIES.join(', ')})`)
+    .option('-p, --project <projectId>', 'Filter by project (shows global + project entries)')
+    .option('--global', 'Show only global entries')
     .option('-l, --limit <n>', 'Limit results', '20')
     .action(async (options) => {
       await listKnowledge(options);
@@ -55,6 +57,7 @@ export function registerKnowledgeCommands(program) {
     .description('Create a new knowledge entry')
     .option('-t, --title <title>', 'Entry title')
     .option('-c, --category <category>', `Category (${CATEGORIES.join(', ')})`)
+    .option('-p, --project <projectId>', 'Associate with project (omit for global)')
     .option('--content <content>', 'Entry content')
     .option('-i, --interactive', 'Interactive mode')
     .action(async (options) => {
@@ -115,6 +118,14 @@ async function listKnowledge(options) {
     };
     if (options.category) params.category = options.category;
 
+    // Handle project/scope filtering
+    if (options.global) {
+      params.scope = 'global';
+    } else if (options.project) {
+      params.projectId = options.project;
+      params.scope = 'combined'; // global + project
+    }
+
     const entries = await api.knowledge.list(params);
 
     output.stopSpinner(true);
@@ -126,8 +137,9 @@ async function listKnowledge(options) {
 
     const tableData = output.table(entries, [
       { key: 'id', header: 'ID', format: (v) => output.colors.muted(v.substring(0, 8)) },
-      { key: 'title', header: 'Title', format: (v) => output.truncate(v, 40) },
+      { key: 'title', header: 'Title', format: (v) => output.truncate(v, 35) },
       { key: 'category', header: 'Category', format: (v) => output.colors.highlight(v) },
+      { key: 'projectId', header: 'Scope', format: (v) => v ? output.colors.success('Project') : output.colors.info('Global') },
       { key: 'updatedAt', header: 'Updated', format: (v) => output.formatRelativeTime(v) },
     ]);
 
@@ -154,6 +166,7 @@ async function showKnowledge(id) {
     console.log('');
     console.log(output.colors.bold(entry.title));
     console.log(output.colors.muted(`Category: ${entry.category}`));
+    console.log(output.colors.muted(`Scope: ${entry.projectId ? `Project (${entry.projectId})` : 'Global'}`));
     console.log(output.colors.muted(`Updated: ${output.formatDateTime(entry.updatedAt)}`));
     console.log('');
     console.log(entry.content);
@@ -173,7 +186,7 @@ async function showKnowledge(id) {
  * Create a knowledge entry
  */
 async function createKnowledge(options) {
-  let { title, category, content, interactive } = options;
+  let { title, category, content, interactive, project } = options;
 
   // Interactive mode or missing required fields
   if (interactive || !title || !category || !content) {
@@ -225,6 +238,7 @@ async function createKnowledge(options) {
       title,
       category,
       content,
+      projectId: project || null, // null = global, string = project-specific
     };
 
     const entry = await api.knowledge.create(entryData);
@@ -235,6 +249,7 @@ async function createKnowledge(options) {
     console.log('');
     console.log(output.colors.bold(entry.title));
     console.log(output.colors.muted(`Category: ${entry.category}`));
+    console.log(output.colors.muted(`Scope: ${entry.projectId ? 'Project' : 'Global'}`));
   } catch (err) {
     output.stopSpinner(false);
     output.error(err.message);
