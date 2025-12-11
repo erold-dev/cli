@@ -12,6 +12,7 @@ import config from '../lib/config.js';
 
 const CATEGORIES = ['database', 'api', 'cloud', 'service', 'credential', 'other'];
 const ENVIRONMENTS = ['all', 'production', 'staging', 'development'];
+const SCOPES = ['personal', 'shared'];
 
 /**
  * Register vault commands
@@ -50,6 +51,7 @@ export function registerVaultCommands(program) {
     .requiredOption('-p, --project <projectId>', 'Project ID')
     .option('-k, --key <key>', 'Secret key (e.g., DATABASE_URL)')
     .option('-v, --value <value>', 'Secret value')
+    .option('-s, --scope <scope>', `Scope: personal (only you) or shared (team, admin only)`, 'personal')
     .option('-c, --category <category>', `Category (${CATEGORIES.join(', ')})`, 'other')
     .option('-e, --environment <env>', `Environment (${ENVIRONMENTS.join(', ')})`, 'all')
     .option('-d, --description <desc>', 'Description')
@@ -109,10 +111,10 @@ async function listVault(options) {
     const tableData = output.table(filtered, [
       { key: 'id', header: 'ID', format: (v) => output.colors.muted(v.substring(0, 8)) },
       { key: 'key', header: 'Key', format: (v) => output.colors.highlight(v) },
+      { key: 'scope', header: 'Scope', format: (v) => formatScope(v) },
       { key: 'category', header: 'Category' },
       { key: 'environment', header: 'Env', format: (v) => formatEnv(v) },
-      { key: 'description', header: 'Description', format: (v) => output.truncate(v || '', 30) },
-      { key: 'updatedAt', header: 'Updated', format: (v) => output.formatRelativeTime(v) },
+      { key: 'description', header: 'Description', format: (v) => output.truncate(v || '', 25) },
     ]);
 
     console.log(tableData);
@@ -179,7 +181,7 @@ async function showVault(entryId, options) {
  * Create a vault entry
  */
 async function createVault(options) {
-  let { key, value, category, environment, description, interactive, project } = options;
+  let { key, value, scope, category, environment, description, interactive, project } = options;
 
   // Interactive mode or missing required fields
   if (interactive || !key || !value) {
@@ -215,6 +217,16 @@ async function createVault(options) {
       questions.push(
         {
           type: 'list',
+          name: 'scope',
+          message: 'Scope:',
+          choices: [
+            { name: 'Personal (only you can access)', value: 'personal' },
+            { name: 'Shared (team access, admin only)', value: 'shared' },
+          ],
+          default: scope || 'personal',
+        },
+        {
+          type: 'list',
           name: 'category',
           message: 'Category:',
           choices: CATEGORIES,
@@ -239,9 +251,16 @@ async function createVault(options) {
     const answers = await inquirer.prompt(questions);
     key = key || answers.key;
     value = value || answers.value;
+    scope = answers.scope || scope;
     category = answers.category || category;
     environment = answers.environment || environment;
     description = answers.description || description;
+  }
+
+  // Validate scope
+  if (!SCOPES.includes(scope)) {
+    output.error(`Invalid scope. Must be one of: ${SCOPES.join(', ')}`);
+    process.exit(1);
   }
 
   // Validate category
@@ -259,6 +278,7 @@ async function createVault(options) {
     const entryData = {
       key,
       value,
+      scope,
       category,
       environment,
       description: description || '',
@@ -271,6 +291,7 @@ async function createVault(options) {
 
     console.log('');
     console.log(output.colors.bold(entry.key));
+    console.log(output.colors.muted(`Scope: ${entry.scope}`));
     console.log(output.colors.muted(`Category: ${entry.category}`));
     console.log(output.colors.muted(`Environment: ${entry.environment}`));
     console.log(output.colors.muted(`ID: ${entry.id}`));
@@ -382,6 +403,18 @@ function formatEnv(env) {
     all: output.colors.muted,
   };
   return (colors[env] || output.colors.muted)(env);
+}
+
+/**
+ * Format scope for display
+ */
+function formatScope(scope) {
+  if (scope === 'personal') {
+    return output.colors.info('personal');
+  } else if (scope === 'shared') {
+    return output.colors.warning('shared');
+  }
+  return output.colors.muted(scope || 'personal');
 }
 
 export default { registerVaultCommands };
