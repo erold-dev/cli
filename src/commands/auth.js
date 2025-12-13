@@ -69,7 +69,7 @@ async function loginCommand(options) {
         mask: '*',
         validate: (input) => {
           if (!input) return 'API key is required';
-          if (!input.startsWith('erold_')) return 'Invalid API key format (should start with erold_)';
+          if (!input.startsWith('erold_') && !input.startsWith('yet_')) return 'Invalid API key format';
           return true;
         },
       },
@@ -77,9 +77,9 @@ async function loginCommand(options) {
     key = answers.apiKey;
   }
 
-  // Validate API key format
-  if (!key.startsWith('erold_')) {
-    output.error('Invalid API key format. Keys should start with "erold_"');
+  // Validate API key format (accept both erold_ and yet_ for backwards compatibility)
+  if (!key.startsWith('erold_') && !key.startsWith('yet_')) {
+    output.error('Invalid API key format');
     process.exit(1);
   }
 

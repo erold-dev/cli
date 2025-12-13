@@ -111,7 +111,7 @@ export function clear() {
  */
 export function isConfigured() {
   const apiKey = get('apiKey');
-  return apiKey && apiKey.startsWith('erold_');
+  return apiKey && (apiKey.startsWith('erold_') || apiKey.startsWith('yet_'));
 }
 
 /**
