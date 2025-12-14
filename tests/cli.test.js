@@ -14,7 +14,7 @@ describe('CLI', () => {
 
   describe('createProgram', () => {
     it('creates program with correct name', () => {
-      expect(program.name()).toBe('yet');
+      expect(program.name()).toBe('erold');
     });
 
     it('has version option', () => {
