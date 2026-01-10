@@ -22,13 +22,47 @@ npm run dev
 npm run build
 ```
 
+## Git Workflow
+
+### Branching Strategy
+
+```
+main                    # Production-ready code
+├── feature/*           # New features (feature/add-command)
+├── bugfix/*            # Bug fixes (bugfix/fix-output)
+├── hotfix/*            # Urgent fixes (hotfix/security-patch)
+└── docs/*              # Documentation (docs/update-readme)
+```
+
+### Branch Naming
+
+| Type | Pattern | Example |
+|------|---------|---------|
+| Feature | `feature/short-description` | `feature/add-sync-command` |
+| Bug fix | `bugfix/short-description` | `bugfix/fix-config-path` |
+| Hotfix | `hotfix/short-description` | `hotfix/security-patch` |
+| Docs | `docs/short-description` | `docs/update-usage-guide` |
+
+### Commit Messages
+
+We use [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat: add task sync command
+fix: resolve config path resolution
+docs: update CLI usage examples
+chore: bump dependencies
+```
+
 ## Pull Request Process
 
-1. Ensure all tests pass before submitting
-2. Update documentation if needed
-3. Follow the existing code style
-4. Write meaningful commit messages
-5. Link any related issues in your PR description
+1. Create a branch from `main`
+2. Make your changes
+3. Ensure all tests pass: `npm test`
+4. Format code: `npm run format` (if available)
+5. Submit PR with clear description
+6. Address review feedback
+7. Squash merge to main
 
 ## Code Style
 
